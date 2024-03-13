@@ -39,6 +39,33 @@ public class MoviesController : Controller
         
         return movie == null ? NotFound() : Ok(movie);
     }
+
+    [HttpGet("by-year/{year:int}")]
+    [ProducesResponseType(typeof(List<Movie>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAllByYear([FromRoute] int year)
+    {
+        //Defered execution: linq only executes when you ask for results. First/ToArray/Where does not execute immedietly,
+        // we only define the queries until we hit ToListAsync, only then do the query execute. 
+        //var in this case is IQueryable. The Where() is acutally a where claus in sql.
+        
+        //If we want to display title and year only, then the following code isn't effective since it's getting 
+        // all the fields from the database when we only want to fetch title and year.
+        
+        /*
+        var allMovies = _context.Movies;
+        var filteredMovies = allMovies.Where(x => x.ReleaseDate.Year == year);
+        return Ok(await filteredMovies.ToListAsync());
+        */
+        
+        //Projection: make another movie class only having an id and a title. Don't work with the full object just because it is easy.
+        var filteredTitles = await _context.Movies
+            .Where(movie => movie.ReleaseDate.Year == year)
+            .Select(movie => new MovieTitle { Id = movie.Identifier, Title = movie.Title })
+            .ToListAsync();
+
+        return Ok(filteredTitles);
+        //Projections let's us control how much data that is being pulled from the DB.
+    }
     
     [HttpPost]
     [ProducesResponseType(typeof(Movie), StatusCodes.Status201Created)]
@@ -49,7 +76,7 @@ public class MoviesController : Controller
         //movie object lacks id, ef does this for us after SaveChanges()
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(Get), new {id = movie.Id}, movie);
+        return CreatedAtAction(nameof(Get), new {id = movie.Identifier}, movie);
     }
     
     [HttpPut("{id:int}")]
