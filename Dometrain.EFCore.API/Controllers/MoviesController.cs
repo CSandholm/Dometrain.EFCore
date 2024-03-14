@@ -29,10 +29,12 @@ public class MoviesController : Controller
     public async Task<IActionResult> Get([FromRoute] int id)
     {
         // Find takes an identifier, like id
-        var movie = await _context.Movies.FindAsync(id);
+        //var movie = await _context.Movies.FindAsync(id);
         
         // Through exeption if there are more than one result
-        //var movie = await _context.Movies.SingleOrDefaultAsync(x => x.Id == id);
+        var movie = await _context.Movies
+            .Include(movie => movie.Genre)
+            .SingleOrDefaultAsync(x => x.Identifier == id);
         
         //Returns fist match, expecting a single result.
         //var movie = await _context.Movies.FirstOrDefaultAsync(x => x.Id == id);
@@ -65,6 +67,18 @@ public class MoviesController : Controller
 
         return Ok(filteredTitles);
         //Projections let's us control how much data that is being pulled from the DB.
+    }
+
+    [HttpGet("until-age/{ageRating}")]
+    [ProducesResponseType(typeof(List<MovieTitle>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAllUntilAge([FromRoute] AgeRating ageRating)
+    {
+        var filteredMovies = await _context.Movies
+            .Where(movie => movie.AgeRating <= ageRating)
+            .Select(movie => new MovieTitle { Id = movie.Identifier, Title = movie.Title })
+            .ToListAsync();
+
+        return Ok(filteredMovies);
     }
     
     [HttpPost]

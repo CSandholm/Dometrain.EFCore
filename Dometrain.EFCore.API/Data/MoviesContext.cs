@@ -1,4 +1,5 @@
 ﻿using Dometrain.EFCore.API.Data.Entity_Mapping;
+using Dometrain.EFCore.API.Data.EntityMapping;
 using Dometrain.EFCore.API.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,8 @@ namespace Dometrain.EFCore.API.Data;
 public class MoviesContext : DbContext
 {
     public DbSet<Movie> Movies => Set<Movie>();
+    public DbSet<Genre> Genres => Set<Genre>();
+    
     // => get only property , Set  is protected, not nullable and cleaner than ending with = null!;
     //public DbSet<Movie> Movies { set; get; } = null!;
 
@@ -26,6 +29,7 @@ public class MoviesContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.ApplyConfiguration(new GenreMapping());
         modelBuilder.ApplyConfiguration(new MovieMapping());
     }
 }

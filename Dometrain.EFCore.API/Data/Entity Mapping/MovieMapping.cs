@@ -1,4 +1,5 @@
-﻿using Dometrain.EFCore.API.Models;
+﻿using Dometrain.EFCore.API.Data.ValueConverters;
+using Dometrain.EFCore.API.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -18,10 +19,28 @@ public class MovieMapping : IEntityTypeConfiguration<Movie>
             .IsRequired();
 
         builder.Property(movie => movie.ReleaseDate)
-            .HasColumnType("date");
+            .HasColumnType("char(8)")
+            .HasConversion(new DateTimeToChar8Converter());
 
         builder.Property(movie => movie.Synopsis)
             .HasColumnType("varchar(max)")
             .HasColumnName("Plot");
+
+        builder
+            .HasOne(movie => movie.Genre)
+            .WithMany(genre => genre.Movies)
+            .HasPrincipalKey(genre => genre.Id)
+            .HasForeignKey(movie => movie.MainGenreId);
+
+        //Seed: data that needs to be created always.
+        builder.HasData(new Movie
+        {
+            Identifier = 1,
+            Title = "Bight Club",
+            ReleaseDate = new DateTime(1999, 9, 10),
+            Synopsis = "A fight brings on many fights.",
+            MainGenreId = 1,
+            AgeRating = AgeRating.Adolescent
+        });
     }
 }
