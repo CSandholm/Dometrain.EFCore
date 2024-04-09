@@ -12,6 +12,8 @@ public class Movie
     public string? Synopsis { get; set; }
     public AgeRating AgeRating { get; set; }
 
+    public decimal InternetRating { get; set; }
+
     public Genre Genre { get; set; }
     public int MainGenreId { get; set; }
     public Person Director { get; set; }

@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Dometrain.EFCore.API.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,10 +21,25 @@ builder.Services.AddDbContext<MoviesContext>();
 var app = builder.Build();
 
 //Dirty Hack and should not be used more than in development for convenience:
+/*
 var scope = app.Services.CreateScope();
 var context = scope.ServiceProvider.GetRequiredService<MoviesContext>();
 context.Database.EnsureDeleted(); //All data would be lost.
 context.Database.EnsureCreated();
+
+//OR update to the latest version of migration:
+await context.Database.MigrateAsync();
+*/
+
+var scope = app.Services.CreateScope();
+var context = scope.ServiceProvider.GetRequiredService<MoviesContext>();
+var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
+if (pendingMigrations.Count() > 0)
+{
+    throw new Exception("Database not fully migrated for MovieContext");
+}
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

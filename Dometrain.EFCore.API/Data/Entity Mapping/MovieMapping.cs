@@ -37,25 +37,5 @@ public class MovieMapping : IEntityTypeConfiguration<Movie>
         
         builder.OwnsMany(movie => movie.Actors)
             .ToTable("Movie_Actors");
-
-        //Seed: data that needs to be created always.
-        builder.HasData(new Movie
-        {
-            Identifier = 1,
-            Title = "Bight Club",
-            ReleaseDate = new DateTime(1999, 9, 10),
-            Synopsis = "A fight brings on many fights.",
-            MainGenreId = 1,
-            AgeRating = AgeRating.Adolescent
-        });
-        //Seeding owns-types
-        builder.OwnsOne(movie => movie.Director)
-            .HasData(new { MovieIdentifier = 1, FirstName = "David", LastName = "Filch" });
-
-        builder.OwnsMany(movie => movie.Actors)
-            .HasData(
-                new {MovieIdentifier = 1, Id = 1, FirstName = "Brad", LastName = "Pitt"},
-                new {MovieIdentifier = 1, Id = 2, FirstName = "Edward", LastName = "Norton"} 
-            );
     }
 }
