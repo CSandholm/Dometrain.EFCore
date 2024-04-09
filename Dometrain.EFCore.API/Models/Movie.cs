@@ -1,3 +1,6 @@
+using System.Diagnostics;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
 namespace Dometrain.EFCore.API.Models;
 
 public class Movie
@@ -11,6 +14,9 @@ public class Movie
 
     public Genre Genre { get; set; }
     public int MainGenreId { get; set; }
+    public Person Director { get; set; }
+    public ICollection<Person> Actors { get; set; }
+    
 }
 
 public enum AgeRating
