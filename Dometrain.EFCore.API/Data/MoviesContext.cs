@@ -7,12 +7,20 @@ namespace Dometrain.EFCore.API.Data;
 
 public class MoviesContext : DbContext
 {
+    public MoviesContext(DbContextOptions<MoviesContext> options)
+        : base (options)
+    {
+        
+    }
     public DbSet<Movie> Movies => Set<Movie>();
     public DbSet<Genre> Genres => Set<Genre>();
     
     // => get only property , Set  is protected, not nullable and cleaner than ending with = null!;
     //public DbSet<Movie> Movies { set; get; } = null!;
 
+    
+    /*
+    //DB options should not be configured here, instead use dependency injection, hence the constructor
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseSqlServer("""
@@ -26,6 +34,7 @@ public class MoviesContext : DbContext
         optionsBuilder.LogTo(Console.WriteLine);
         base.OnConfiguring(optionsBuilder);
     }
+    */
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
